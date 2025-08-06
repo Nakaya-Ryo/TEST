@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Cool Cursor Demo</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    overflow: hidden;
+    color: white;
+    font-family: sans-serif;
+  }
+
+  h1 {
+    text-align: center;
+    margin-top: 40vh;
+    font-size: 3rem;
+  }
+
+  /* カスタムカーソル */
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border: 2px solid rgba(255,255,255,0.8);
+    border-radius: 50%;
+    pointer-events: none;
+    transition: transform 0.1s ease;
+    z-index: 9999;
+    mix-blend-mode: difference;
+  }
+
+  /* トレイルの残像 */
+  .trail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    mix-blend-mode: difference;
+  }
+</style>
+</head>
+<body>
+
+<h1>カーソルを動かしてみてください</h1>
+
+<div class="cursor"></div>
+
+<script>
+const cursor = document.querySelector('.cursor');
+let trails = [];
+
+document.addEventListener('mousemove', e => {
+  // カーソル位置更新
+  cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+
+  // トレイル生成
+  const trail = document.createElement('div');
+  trail.className = 'trail';
+  trail.style.left = e.clientX + 'px';
+  trail.style.top = e.clientY + 'px';
+  document.body.appendChild(trail);
+  trails.push(trail);
+
+  // トレイルをフェードアウトして削除
+  setTimeout(() => {
+    trail.style.opacity = 0;
+    setTimeout(() => {
+      trail.remove();
+      trails.shift();
+    }, 300);
+  }, 10);
+});
+</script>
+
+</body>
+</html>
