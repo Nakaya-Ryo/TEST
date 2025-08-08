@@ -1,88 +1,304 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>Cool Cursor Demo</title>
-<style>
-  body {
-    margin: 0;
-    height: 100vh;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    overflow: hidden;
-    color: white;
-    font-family: sans-serif;
-  }
-
-  h1 {
-    text-align: center;
-    margin-top: 40vh;
-    font-size: 3rem;
-  }
-
-  /* カスタムカーソル */
-  .cursor {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 20px;
-    height: 20px;
-    margin-top: -10px;
-    margin-left: -10px;
-    border: 2px solid rgba(255,255,255,0.8);
-    border-radius: 50%;
-    pointer-events: none;
-    transition: transform 0.1s ease;
-    z-index: 9999;
-    mix-blend-mode: difference;
-  }
-
-  /* トレイルの残像 */
-  .trail {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 6px;
-    height: 6px;
-    background: rgba(255,255,255,0.5);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    mix-blend-mode: difference;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>ロゴギャラリー（左スクロール＋右説明）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --left-width: 35vw; --card: 200px; }
+    *{ box-sizing: border-box; }
+    body{
+      margin:0; background:#0f0f11; color:#eaeaea; font-family:system-ui, sans-serif; height:100vh; overflow:hidden;
+    }
+    .layout{
+      display:flex; height:100vh; gap:0; 
+    }
+    /* 左：縦スクロール列 */
+    .left{
+      width:var(--left-width); border-right:1px solid #222; position:relative; background:#111;
+    }
+    .carousel{
+      display:flex; flex-direction:column;
+      overflow-y:auto; height:100%; padding:40px 24px;
+      scroll-snap-type: none;
+      cursor:grab;
+    }
+    .carousel:active{ cursor:grabbing; }
+    .logo{
+      flex:0 0 auto; width:100%; max-width:520px; height:var(--card);
+      margin: -10px auto 22px; /* ちょい重なり感 */
+      background:#232326; border-radius:20px; scroll-snap-align:center;
+      display:flex; align-items:center; gap:16px; padding:16px 18px;
+      transition: transform .25s, box-shadow .25s, background .25s;
+      box-shadow:0 0 0 rgba(0,0,0,0);
+      border:1px solid #2b2b2f;
+    }
+    .logo:hover{ transform:scale(1.06); }
+    .logo.active{
+      transform:scale(1.1);
+      box-shadow: 0 0 15px rgba(0, 170, 255, 0.8), /* 外側に青く発光 */
+                  0 0 30px rgba(0, 170, 255, 0.5); /* さらに外に柔らかく */
+      border: 2px solid rgba(0, 170, 255, 0.9);    /* 枠線も青く */
+      z-index:5;
+    }
+    .logo img{
+      width:160px; height:160px; object-fit:contain; flex:0 0 auto; filter:drop-shadow(0 2px 8px rgba(0,0,0,.3));
+      border-radius:16px; background:#1b1b1f;
+    }
+    .logo .meta{
+      min-width:0; display:flex; flex-direction:column; gap:8px;
+    }
+    .logo .title{
+      font-weight:700; font-size:18px; line-height:1.2; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .logo .hint{ font-size:12px; color:#9aa0a6; }
+    /* 右：詳細 */
+    .right{
+      flex:1; padding:32px 40px; overflow:auto; position:relative;
+      background: radial-gradient(800px 400px at 20% 10%, rgba(35,35,45,.28), transparent 60%) #0f0f11;
+    }
+    .panel{
+      max-width:900px; margin:0 auto;
+      padding:28px 28px 32px; border:1px solid #2b2b2f; border-radius:20px; background:#141418;
+      box-shadow:0 10px 30px rgba(0,0,0,.28);
+    }
+    .panel .hero{
+      display:flex; gap:20px; align-items:center; margin-bottom:16px;
+    }
+    .panel .hero img{
+      width:96px; height:96px; object-fit:contain; background:#1b1b20; border-radius:16px; padding:8px;
+      border:1px solid #2b2b2f;
+    }
+    .panel h1{ margin:0; font-size:24px; }
+    .panel .badges{ display:flex; gap:8px; margin:8px 0 4px; flex-wrap:wrap; }
+    .badge{
+      font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid #3b3b42; color:#cfd3dc; background:#1a1a1f;
+    }
+    .panel p{ color:#cfd3dc; line-height:1.7; }
+    .panel a{ color:#8ab4ff; text-decoration:none; }
+    .panel a:hover{ text-decoration:underline; }
+    .panel .cta{
+      margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .btn{
+      padding:10px 14px; border-radius:12px; border:1px solid #3b3b42; background:#1d1d22; color:#eaeaea; text-decoration:none;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:hover{ background:#23232a; }
+    /* レスポンシブ（幅が狭い時は縦積み） */
+    @media (max-width: 980px){
+      :root{ --left-width: 100vw; }
+      .layout{ flex-direction:column; }
+      body{ overflow:auto; }
+      .left{ height:60vh; border-right:none; border-bottom:1px solid #222; }
+      .right{ height:auto; }
+    }
+  </style>
 </head>
 <body>
 
-<h1>カーソルを動かしてみてください</h1>
+<div class="layout">
+  <!-- 左：ロゴリスト（縦スクロール＆ドラッグ） -->
+  <aside class="left">
+    <div class="carousel" id="carousel">
+      <!-- data-key は下の items[] と対応させる -->
+      <div class="logo" data-key="pharmaforest">
+        <img src="./logo/pharmaforest.png" alt="PharmaForest">
+        <div class="meta">
+          <div class="title">PharmaForest</div>
+          <div class="hint">Click / Tap で詳細</div>
+        </div>
+      </div>
+      <div class="logo" data-key="rtfcreator">
+        <img src="./logo/rtfcreator.png" alt="RTF Creator">
+        <div class="meta"><div class="title">RTF Creator</div><div class="hint">SAS → RTF 生成支援</div></div>
+      </div>
+      <div class="logo" data-key="sas_faker">
+        <img src="./logo/sas_faker.png" alt="sas_faker">
+        <div class="meta"><div class="title">SAS Faker</div><div class="hint">擬似データ生成</div></div>
+      </div>
+      <div class="logo" data-key="sashash">
+        <img src="./logo/sashash.png" alt="sashash">
+        <div class="meta"><div class="title">SAS Hash</div><div class="hint">ハッシュ活用</div></div>
+      </div>
+      <div class="logo" data-key="xattr_kit">
+        <img src="./logo/xattr_kit.png" alt="xattr_kit">
+        <div class="meta"><div class="title">xattr Kit</div><div class="hint">拡張属性ツール</div></div>
+      </div>
+      <div class="logo" data-key="oncoplotter">
+        <img src="./logo/oncoplotter.png" alt="oncoplotter">
+        <div class="meta"><div class="title">OncoPlotter</div><div class="hint">腫瘍向け可視化</div></div>
+      </div>
+      <div class="logo" data-key="maxims4sas">
+        <img src="./logo/maxims4sas_small.png" alt="maxims4sas">
+        <div class="meta"><div class="title">maxims4sas</div><div class="hint">格言パック</div></div>
+      </div>
+      <div class="logo" data-key="cloak">
+        <img src="./logo/cloak_small.png" alt="cloak">
+        <div class="meta"><div class="title">Cloak</div><div class="hint">秘匿化ユーティリティ</div></div>
+      </div>
+      <div class="logo" data-key="vis_review_kit">
+        <img src="./logo/vis_review_kit_small.png" alt="vis_review_kit">
+        <div class="meta"><div class="title">VIS Review Kit</div><div class="hint">レビュー補助</div></div>
+      </div>
+    </div>
+  </aside>
 
-<div class="cursor"></div>
+  <!-- 右：説明パネル -->
+  <main class="right">
+    <section class="panel" id="panel">
+      <div class="hero">
+        <img id="panelImg" src="./logo/pharmaforest.png" alt="">
+        <div>
+          <h1 id="panelTitle">PharmaForest</h1>
+          <div class="badges" id="panelBadges">
+            <span class="badge">SAS</span><span class="badge">Clinical</span>
+          </div>
+        </div>
+      </div>
+      <p id="panelDesc">
+        PharmaForest は医薬品統計・臨床データ解析向けのSASパッケージ群のハブです。エコシステム全体の可視化、導入、学習を素早く行えます。
+      </p>
+      <div class="cta" id="panelLinks">
+        <a class="btn" href="#" target="_blank" rel="noopener">Docs</a>
+        <a class="btn" href="#" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </section>
+  </main>
+</div>
 
 <script>
-const cursor = document.querySelector('.cursor');
-let trails = [];
+  // 右パネルに出す内容（自由に編集）
+  const items = {
+    pharmaforest: {
+      title: "PharmaForest",
+      img: "./logo/pharmaforest.png",
+      desc: "PharmaForest は医薬品統計・臨床データ解析向けのSASパッケージ群のハブです。エコシステム全体の可視化、導入、学習を素早く行えます。",
+      badges: ["SAS","Clinical"],
+      links: [{text:"Docs", href:"#"}, {text:"GitHub", href:"#"}]
+    },
+    rtfcreator: {
+      title: "RTF Creator",
+      img: "./logo/rtfcreator.png",
+      desc: "SASの表・図をRTFに美しく落とし込む支援ツール。テンプレートとスタイル適用を効率化。",
+      badges: ["RTF","Reporting"],
+      links: [{text:"Docs", href:"#"}, {text:"GitHub", href:"#"}]
+    },
+    sas_faker: {
+      title: "SAS Faker",
+      img: "./logo/sas_faker.png",
+      desc: "テスト用の擬似臨床データをサクッと生成。CDISCっぽい構造も再現可能。",
+      badges: ["Mock","Generator"],
+      links: [{text:"Docs", href:"#"}]
+    },
+    sashash: {
+      title: "SAS Hash",
+      img: "./logo/sashash.png",
+      desc: "ハッシュオブジェクトを使った高速結合・参照のサンプル集とユーティリティ。",
+      badges: ["Performance","Hash"],
+      links: [{text:"GitHub", href:"#"}]
+    },
+    xattr_kit: {
+      title: "xattr Kit",
+      img: "./logo/xattr_kit.png",
+      desc: "拡張属性の付与・抽出を支援するツール群。メタデータ管理に。",
+      badges: ["Utility"],
+      links: [{text:"Docs", href:"#"}]
+    },
+    oncoplotter: {
+      title: "OncoPlotter",
+      img: "./logo/oncoplotter.png",
+      desc: "腫瘍領域の図表作成を高速化。SwimmerやWaterfallなどの定番図に対応。",
+      badges: ["Oncology","Viz"],
+      links: [{text:"Docs", href:"#"}]
+    },
+    maxims4sas: {
+      title: "maxims4sas",
+      img: "./logo/maxims4sas_small.png",
+      desc: "SASとデータ仕事に効く格言・ベストプラクティス集。コードレビュー時のリマインダーにも。",
+      badges: ["Best Practice"],
+      links: [{text:"GitHub", href:"#"}]
+    },
+    cloak: {
+      title: "Cloak",
+      img: "./logo/cloak_small.png",
+      desc: "データの秘匿化・匿名化ユーティリティ。サンプル配布や検証用に。",
+      badges: ["Privacy"],
+      links: [{text:"Docs", href:"#"}]
+    },
+    vis_review_kit: {
+      title: "VIS Review Kit",
+      img: "./logo/vis_review_kit_small.png",
+      desc: "可視化レビューのチェックリストと補助スクリプト集。表現の一貫性を担保。",
+      badges: ["Review","QC"],
+      links: [{text:"Docs", href:"#"}]
+    }
+  };
 
-document.addEventListener('mousemove', e => {
-  // カーソル位置更新
-  cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+  // 左列：ドラッグで縦スクロール（掴んでスワイプ）
+  const carousel = document.getElementById('carousel');
+  let isDown=false, startY=0, scrollTop=0;
 
-  // トレイル生成
-  const trail = document.createElement('div');
-  trail.className = 'trail';
-  trail.style.left = e.clientX + 'px';
-  trail.style.top = e.clientY + 'px';
-  document.body.appendChild(trail);
-  trails.push(trail);
+  carousel.addEventListener('mousedown', (e)=>{
+    isDown=true; startY=e.pageY - carousel.offsetTop; scrollTop=carousel.scrollTop;
+  });
+  window.addEventListener('mouseup', ()=>{ isDown=false; });
+  carousel.addEventListener('mouseleave', ()=>{ isDown=false; });
+  carousel.addEventListener('mousemove', (e)=>{
+    if(!isDown) return;
+    e.preventDefault();
+    const y = e.pageY - carousel.offsetTop;
+    const walk = (y - startY) * 1.4;
+    carousel.scrollTop = scrollTop - walk;
+  });
 
-  // トレイルをフェードアウトして削除
-  setTimeout(() => {
-    trail.style.opacity = 0;
-    setTimeout(() => {
-      trail.remove();
-      trails.shift();
-    }, 300);
-  }, 10);
-});
+  // タップ（モバイル）でもドラッグ
+  let touchStartY=0, touchScrollTop=0;
+  carousel.addEventListener('touchstart', (e)=>{
+    const t=e.touches[0];
+    touchStartY=t.pageY - carousel.offsetTop;
+    touchScrollTop=carousel.scrollTop;
+  }, {passive:true});
+  carousel.addEventListener('touchmove', (e)=>{
+    const t=e.touches[0];
+    const y=t.pageY - carousel.offsetTop;
+    const walk=(y - touchStartY) * 1.2;
+    carousel.scrollTop = touchScrollTop - walk;
+  }, {passive:true});
+
+  // 右パネル更新
+  const panelImg   = document.getElementById('panelImg');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelDesc  = document.getElementById('panelDesc');
+  const panelBadges= document.getElementById('panelBadges');
+  const panelLinks = document.getElementById('panelLinks');
+
+  function updatePanel(key){
+    const it = items[key]; if(!it) return;
+    panelImg.src = it.img; panelImg.alt = it.title;
+    panelTitle.textContent = it.title;
+    panelDesc.textContent = it.desc;
+    panelBadges.innerHTML = (it.badges||[]).map(b=>`<span class="badge">${b}</span>`).join('');
+    panelLinks.innerHTML  = (it.links||[]).map(l=>`<a class="btn" href="${l.href}" target="_blank" rel="noopener">${l.text}</a>`).join('');
+  }
+
+  // 左の要素クリックで選択＆右更新、中央にスクロール
+  const cards = Array.from(document.querySelectorAll('.logo'));
+  cards.forEach(card=>{
+    card.addEventListener('click', ()=>{
+      cards.forEach(c=>c.classList.remove('active'));
+      card.classList.add('active');
+      const key = card.getAttribute('data-key');
+      updatePanel(key);
+      card.scrollIntoView({block:'center', behavior:'smooth'});
+    });
+  });
+
+  // 初期選択
+  (function init(){
+    const first = document.querySelector('.logo[data-key="pharmaforest"]') || cards[0];
+    if(first){ updatePanel(first.getAttribute('data-key')); }
+  })();
 </script>
-
 </body>
 </html>
