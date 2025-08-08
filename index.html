@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>ロゴギャラリー（左スクロール＋右説明）</title>
+  <title>PharmaForest Gallery</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{ --left-width: 35vw; --card: 200px; }
@@ -43,7 +43,7 @@
     }
     .logo img{
       width:160px; height:160px; object-fit:contain; flex:0 0 auto; filter:drop-shadow(0 2px 8px rgba(0,0,0,.3));
-      border-radius:16px; background:#1b1b1f;
+      border-radius:16px; background:#232326;
     }
     .logo .meta{
       min-width:0; display:flex; flex-direction:column; gap:8px;
@@ -55,7 +55,14 @@
     /* 右：詳細 */
     .right{
       flex:1; padding:32px 40px; overflow:auto; position:relative;
-      background: radial-gradient(800px 400px at 20% 10%, rgba(35,35,45,.28), transparent 60%) #0f0f11;
+     /* background: radial-gradient(800px 400px at 20% 10%, rgba(35,35,45,.28), transparent 60%) #0f0f11;*/
+       /* 背景画像を指定 */
+  background-image: url('./logo/picture_pharmaforest.png');
+
+  /* 背景の表示方法 */
+  background-size: cover;       /* 全体に拡大縮小して表示 */
+  background-position: center;  /* 中央寄せ */
+  background-repeat: no-repeat; /* 繰り返さない */
     }
     .panel{
       max-width:900px; margin:0 auto;
@@ -106,40 +113,76 @@
         <img src="./logo/pharmaforest.png" alt="PharmaForest">
         <div class="meta">
           <div class="title">PharmaForest</div>
-          <div class="hint">Click / Tap で詳細</div>
+          <div class="hint">Package Repository</div>
         </div>
       </div>
-      <div class="logo" data-key="rtfcreator">
-        <img src="./logo/rtfcreator.png" alt="RTF Creator">
-        <div class="meta"><div class="title">RTF Creator</div><div class="hint">SAS → RTF 生成支援</div></div>
-      </div>
-      <div class="logo" data-key="sas_faker">
-        <img src="./logo/sas_faker.png" alt="sas_faker">
-        <div class="meta"><div class="title">SAS Faker</div><div class="hint">擬似データ生成</div></div>
+      <div class="logo" data-key="oncoplotter">
+        <img src="./logo/oncoplotter.png" alt="OncoPlotter">
+        <div class="meta"><div class="title">OncoPlotter</div><div class="hint">Plot Tools for Oncology Area</div></div>
       </div>
       <div class="logo" data-key="sashash">
         <img src="./logo/sashash.png" alt="sashash">
-        <div class="meta"><div class="title">SAS Hash</div><div class="hint">ハッシュ活用</div></div>
+        <div class="meta"><div class="title">sashash</div><div class="hint">Hash Tools</div></div>
+      </div>
+      <div class="logo" data-key="sas_dataset_json">
+        <img src="./logo/sas_dataset_json.png" alt="sas_dataset_json">
+        <div class="meta"><div class="title">SAS Dataset JSON</div><div class="hint">Dataset JSON Converter</div></div>
+      </div>
+      <div class="logo" data-key="saspacer">
+        <img src="./logo/saspacer.png" alt="saspacer">
+        <div class="meta"><div class="title">saspacer</div><div class="hint">SAS Package Generator</div></div>
+      </div>
+      <div class="logo" data-key="misc">
+        <img src="./logo/misc.png" alt="misc">
+        <div class="meta"><div class="title">Misc</div><div class="hint">Miscellaneous Utilities</div></div>
+      </div>
+      <div class="logo" data-key="sas_faker">
+        <img src="./logo/sas_faker.png" alt="sas_faker">
+        <div class="meta"><div class="title">SAS_Faker</div><div class="hint">Dummy Data Generator</div></div>
+      </div>
+      <div class="logo" data-key="saslogchecker">
+        <img src="./logo/saslogchecker.png" alt="saslogchecker">
+        <div class="meta"><div class="title">SASLogChecker</div><div class="hint">Log Checking Utility</div></div>
+      </div>
+      <div class="logo" data-key="sas_compare">
+        <img src="./logo/sas_compare.png" alt="sas_compare">
+        <div class="meta"><div class="title">SAS_Compare</div><div class="hint">Compare Support Tools</div></div>
+      </div>
+      <div class="logo" data-key="rtfcreator">
+        <img src="./logo/rtfcreator.png" alt="rtfcreator">
+        <div class="meta"><div class="title">RTF Creator</div><div class="hint">RTF Creator</div></div>
+      </div>
+      <div class="logo" data-key="shutter_chance">
+        <img src="./logo/shutter_chance.png" alt="shutter_chance">
+        <div class="meta"><div class="title">Shutter Chance</div><div class="hint">Snapshot Tools</div></div>
+      </div>
+      <div class="logo" data-key="devil">
+        <img src="./logo/devil.png" alt="devil">
+        <div class="meta"><div class="title">Devil</div><div class="hint">Playful Ideas for a Break</div></div>
       </div>
       <div class="logo" data-key="xattr_kit">
         <img src="./logo/xattr_kit.png" alt="xattr_kit">
-        <div class="meta"><div class="title">xattr Kit</div><div class="hint">拡張属性ツール</div></div>
-      </div>
-      <div class="logo" data-key="oncoplotter">
-        <img src="./logo/oncoplotter.png" alt="oncoplotter">
-        <div class="meta"><div class="title">OncoPlotter</div><div class="hint">腫瘍向け可視化</div></div>
-      </div>
-      <div class="logo" data-key="maxims4sas">
-        <img src="./logo/maxims4sas_small.png" alt="maxims4sas">
-        <div class="meta"><div class="title">maxims4sas</div><div class="hint">格言パック</div></div>
+        <div class="meta"><div class="title">xattr Kit</div><div class="hint">Extended Attributes Toolkit</div></div>
       </div>
       <div class="logo" data-key="cloak">
-        <img src="./logo/cloak_small.png" alt="cloak">
-        <div class="meta"><div class="title">Cloak</div><div class="hint">秘匿化ユーティリティ</div></div>
+        <img src="./logo/cloak.png" alt="cloak">
+        <div class="meta"><div class="title">Cloak</div><div class="hint">Check-in/Check-out Storekeeper</div></div>
       </div>
       <div class="logo" data-key="vis_review_kit">
-        <img src="./logo/vis_review_kit_small.png" alt="vis_review_kit">
-        <div class="meta"><div class="title">VIS Review Kit</div><div class="hint">レビュー補助</div></div>
+        <img src="./logo/vis_review_kit.png" alt="vis_review_kit">
+        <div class="meta"><div class="title">Vis Review Kit</div><div class="hint">Visual Review Toolkit</div></div>
+      </div>
+      <div class="logo" data-key="odstable_layoutshowcase">
+        <img src="./logo/odstable_layoutshowcase.png" alt="odstable_layoutshowcase">
+        <div class="meta"><div class="title">ODSTable Layout Showcase</div><div class="hint">Showcase for ODSTable Layouts</div></div>
+      </div>
+      <div class="logo" data-key="maxims4sas">
+        <img src="./logo/maxims4sas.png" alt="maxims4sas">
+        <div class="meta"><div class="title">maxims4sas</div><div class="hint">Best Practices for SAS</div></div>
+      </div>
+      <div class="logo" data-key="forest_navigator">
+        <img src="./logo/forest_navigator.png" alt="forest_navigator">
+        <div class="meta"><div class="title">Dr. Forest Morio</div><div class="hint">Navigater of PharmaForest</div></div>
       </div>
     </div>
   </aside>
