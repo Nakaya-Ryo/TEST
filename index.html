@@ -99,57 +99,70 @@
     }
     .btn:hover{ background:#23232a; }
     /* レスポンシブ（幅が狭い時は縦積み） */
-/* タブレット以下 */
-@media (max-width: 980px){
-  :root{ --left-width: 100vw; --card: 160px; } /* 左カラムを全幅に */
-  .left{ height:56vh; }                        /* 左を少し小さめに */
-  .right{ padding:20px 16px; }                 /* 右の余白を詰める */
-  .panel{ max-width: 760px; padding:20px; }    /* パネルを小ぶりに */
-  .panel .hero img{ width:72px; height:72px; } /* アイコン縮小 */
-  .badge{ font-size:11px; padding:3px 7px; }
-  /* 背景画像が主張し過ぎるなら弱める */
-  .right{ background-size: cover; background-position:center; }
-}
+    /* タブレット以下 */
+    @media (max-width: 980px){
+      :root{ --left-width: 100vw; --card: 160px; } /* 左カラムを全幅に */
+      .left{ height:56vh; }                        /* 左を少し小さめに */
+      .right{ padding:20px 16px; }                 /* 右の余白を詰める */
+      .panel{ max-width: 760px; padding:20px; }    /* パネルを小ぶりに */
+      .panel .hero img{ width:72px; height:72px; } /* アイコン縮小 */
+      .badge{ font-size:11px; padding:3px 7px; }
+      /* 背景画像が主張し過ぎるなら弱める */
+      .right{ background-size: cover; background-position:center; }
+    }
 
-/* スマホ（横幅 ≤ 600px） */
-@media (max-width: 600px){
-  :root{ --card: 140px; }
-  .carousel{ padding:20px 14px; gap: 10px; }
-  .logo{ height: var(--card); padding:12px 14px; gap:12px; }
-  .logo img{ width:120px; height:120px; }
-  .panel{ border-radius:14px; padding:16px; }
-  .panel h1{ font-size:20px; }
-  .panel .hero{ gap:14px; }
-  .panel .hero img{ width:64px; height:64px; }
+    /* スマホ（横幅 ≤ 600px） */
+    @media (max-width: 600px){
+      :root{ --card: 140px; }
+      .carousel{ padding:20px 14px; gap: 10px; }
+      .logo{ height: var(--card); padding:12px 14px; gap:12px; }
+      .logo img{ width:120px; height:120px; }
+      .panel{ border-radius:14px; padding:16px; }
+      .panel h1{ font-size:20px; }
+      .panel .hero{ gap:14px; }
+      .panel .hero img{ width:64px; height:64px; }
 
-  /* 説明グリッドは1列化して読みやすく */
-  #panelDesc .info-grid{
-    grid-template-columns: 1fr;
-    gap: 6px 0;
-  }
-  #panelDesc .label{ font-size:12px; opacity:.9; }
-  #panelDesc .value{ margin-bottom:10px; }
-  /* 画像を画面に合わせてさらに小さく */
-  #panelDesc img{ max-width: 90% !important; }
-  /* バッジ/ボタン折返し */
-  .panel .badges{ gap:6px; }
-  .btn{ padding:10px 12px; font-size:14px; }
-}
+      /* 説明グリッドは1列化して読みやすく */
+      #panelDesc .info-grid{
+        grid-template-columns: 1fr;
+        gap: 6px 0;
+      }
+      #panelDesc .label{ font-size:12px; opacity:.9; }
+      #panelDesc .value{ margin-bottom:10px; }
+      /* 画像を画面に合わせてさらに小さく */
+      #panelDesc img{ max-width: 90% !important; }
+      /* バッジ/ボタン折返し */
+      .panel .badges{ gap:6px; }
+      .btn{ padding:10px 12px; font-size:14px; }
+    }
 
-/* コンパクト端末（≤ 400px） */
-@media (max-width: 400px){
-  :root{ --card: 120px; }
-  .logo img{ width:96px; height:96px; }
-  .panel h1{ font-size:18px; }
-  .badge{ font-size:10px; padding:3px 6px; }
-  .btn{ font-size:13px; }
-}
+    /* コンパクト端末（≤ 400px） */
+    @media (max-width: 400px){
+      :root{ --card: 120px; }
+      .logo img{ width:96px; height:96px; }
+      .panel h1{ font-size:18px; }
+      .badge{ font-size:10px; padding:3px 6px; }
+      .btn{ font-size:13px; }
+    }
 
-/* 縦長画面向け最適化（端末が縦向きのとき） */
-@media (orientation: portrait){
-  .left{ height: 35vh; } /* 上のロゴリストは少し浅めに */
-  .right{ height: 65vh; }/* 右パネルがすぐ見えるように */
-}
+    /* スマホ縦向け最適化（最後に置く） */
+    @media (max-width: 600px) and (orientation: portrait){
+      .layout{
+        flex-direction: column;   /* 縦並びを明示 */
+        height: 100vh;            /* 画面ぴったり */
+      }
+      .left{
+        flex: 0 0 35vh;           /* 上を固定高さ */
+        height: 35vh;             /* どっちでも効くように保険 */
+        min-height: 0;            /* ← これが大事 */
+      }
+      .right{
+        flex: 1 1 auto;           /* 残り全部使う */
+        min-height: 0;            /* ← はみ出し防止。中のoverflowが効く */
+        overflow: auto;           /* 右パネル単体でスクロール可能に */
+      }
+    }
+
 
     #panelDesc .info { display:flex; flex-direction:column; gap:12px; }
     #panelDesc .summary { margin:0; color:#cfd3dc; line-height:1.7; }
