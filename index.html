@@ -100,6 +100,29 @@
       .left{ height:60vh; border-right:none; border-bottom:1px solid #222; }
       .right{ height:auto; }
     }
+    #panelDesc .info { display:flex; flex-direction:column; gap:12px; }
+    #panelDesc .summary { margin:0; color:#cfd3dc; line-height:1.7; }
+
+    #panelDesc .info-grid{
+      display:grid;
+      grid-template-columns: 160px 1fr; /* ← ラベル列幅はここで調整 */
+      gap: 8px 16px;                    /* 行間 / 列間 */
+      align-items:start;
+    }
+
+    #panelDesc .label{
+      color:#9aa0a6;
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.2px;
+    }
+
+    #panelDesc .value{
+      color:#eaeaea;
+      line-height:1.7;
+      min-width:0; /* 長文の折返し安定化 */
+      word-break: break-word;
+    }
   </style>
 </head>
 <body>
@@ -138,7 +161,7 @@
       </div>
       <div class="logo" data-key="sas_faker">
         <img src="./logo/sas_faker.png" alt="sas_faker">
-        <div class="meta"><div class="title">SAS_Faker</div><div class="hint">Dummy Data Generator</div></div>
+        <div class="meta"><div class="title">SAS_FAKER</div><div class="hint">Dummy Data Generator</div></div>
       </div>
       <div class="logo" data-key="saslogchecker">
         <img src="./logo/saslogchecker.png" alt="saslogchecker">
@@ -195,13 +218,13 @@
         <div>
           <h1 id="panelTitle">PharmaForest</h1>
           <div class="badges" id="panelBadges">
-            <span class="badge">SAS</span><span class="badge">Clinical</span>
+            <span class="badge">SAS Packages</span><span class="badge">Repository</span><span class="badge">Open-Source</span><span class="badge">MIT</span>
           </div>
         </div>
       </div>
-      <p id="panelDesc">
-        PharmaForest は医薬品統計・臨床データ解析向けのSASパッケージ群のハブです。エコシステム全体の可視化、導入、学習を素早く行えます。
-      </p>
+      <div id="panelDesc">
+        A collaborative repository of SAS packages for the pharmaceutical space, powered by PHUSE Japan OST (Open Source Technology) WG members—Hiroki Yamanobe, Yutaka Morioka, and Ryo Nakaya—showcasing the list of available packages.
+      </div>
       <div class="cta" id="panelLinks">
         <a class="btn" href="#" target="_blank" rel="noopener">Docs</a>
         <a class="btn" href="#" target="_blank" rel="noopener">GitHub</a>
@@ -211,71 +234,223 @@
 </div>
 
 <script>
-  // 右パネルに出す内容（自由に編集）
+  // 右パネルに出す内容
   const items = {
     pharmaforest: {
       title: "PharmaForest",
       img: "./logo/pharmaforest.png",
-      desc: "PharmaForest は医薬品統計・臨床データ解析向けのSASパッケージ群のハブです。エコシステム全体の可視化、導入、学習を素早く行えます。",
-      badges: ["SAS","Clinical"],
-      links: [{text:"Docs", href:"#"}, {text:"GitHub", href:"#"}]
-    },
-    rtfcreator: {
-      title: "RTF Creator",
-      img: "./logo/rtfcreator.png",
-      desc: "SASの表・図をRTFに美しく落とし込む支援ツール。テンプレートとスタイル適用を効率化。",
-      badges: ["RTF","Reporting"],
-      links: [{text:"Docs", href:"#"}, {text:"GitHub", href:"#"}]
-    },
-    sas_faker: {
-      title: "SAS Faker",
-      img: "./logo/sas_faker.png",
-      desc: "テスト用の擬似臨床データをサクッと生成。CDISCっぽい構造も再現可能。",
-      badges: ["Mock","Generator"],
-      links: [{text:"Docs", href:"#"}]
-    },
-    sashash: {
-      title: "SAS Hash",
-      img: "./logo/sashash.png",
-      desc: "ハッシュオブジェクトを使った高速結合・参照のサンプル集とユーティリティ。",
-      badges: ["Performance","Hash"],
-      links: [{text:"GitHub", href:"#"}]
-    },
-    xattr_kit: {
-      title: "xattr Kit",
-      img: "./logo/xattr_kit.png",
-      desc: "拡張属性の付与・抽出を支援するツール群。メタデータ管理に。",
-      badges: ["Utility"],
-      links: [{text:"Docs", href:"#"}]
+      desc: 
+      `
+      A collaborative repository of SAS packages for the pharmaceutical space, powered by PHUSE Japan OST (Open Source Technology) WG members—Hiroki Yamanobe, Yutaka Morioka, and Ryo Nakaya—showcasing the list of available packages. Any collaboration is very welcome!<br><br>
+      <img src="./logo/wewantyou.png" 
+     alt="we want you" 
+     style="max-width:60%; border-radius:12px; margin-bottom:16px; display:block; margin:0 auto;">
+
+
+      <br><br> PharmaForest is built on top of SAS Packages framework(SPF), which was developed by Bartosz Jablonski. There are more packages in his repository SAS Packages Archive(SASPAC).<br>
+      `,
+      badges: ["SAS Packages","Repository","Open-Source","MIT"],
+      links: [{text:"PharmaForest", href:"https://github.com/PharmaForest"}, {text:"SPF", href:"https://github.com/yabwon/SAS_PACKAGES"},{text:"SASPAC", href:"https://github.com/SASPAC"}]
     },
     oncoplotter: {
       title: "OncoPlotter",
       img: "./logo/oncoplotter.png",
-      desc: "腫瘍領域の図表作成を高速化。SwimmerやWaterfallなどの定番図に対応。",
-      badges: ["Oncology","Viz"],
-      links: [{text:"Docs", href:"#"}]
+      summary: "A SAS package to create figures commonly created in oncology studies.",
+      license: "MIT",
+      authors: ["PharmaForest"],
+      maintainers: ["PharmaForest"],
+      features: ["Kaplan-Meier Plot", "Swimmer Plot", "Waterfall Plot"],
+      macros: ["%kaplan_meier_plot()","<br>%swimmer_plot()","<br>%waterfall_plot()"],
+      badges: ["PharmaForest Original","Oncology","Output/Visualization","MIT"],
+      links: [{text:"OncoPlotter", href:"https://github.com/PharmaForest/OncoPlotter"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
     },
-    maxims4sas: {
-      title: "maxims4sas",
-      img: "./logo/maxims4sas_small.png",
-      desc: "SASとデータ仕事に効く格言・ベストプラクティス集。コードレビュー時のリマインダーにも。",
-      badges: ["Best Practice"],
-      links: [{text:"GitHub", href:"#"}]
+    sashash: {
+      title: "SAS Hash",
+      img: "./logo/sashash.png",
+      summary: "Sashash package provides powerful and efficient hash-based lookup and validation tools specifically designed for SAS programming. Leveraging the robust capabilities of SAS hash objects, this package enables rapid and dynamic key-based data retrieval and existence checking directly within a single data step. This significantly reduces the need for separate sort and merge steps, streamlining workflows and enhancing performance.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["hash object"],
+      macros: ["%kvlookup()","<br>%keycheck()","<br>%kduppchk()"],
+      badges: ["hash","Data Utility","MIT"],
+      links: [{text:"sashash", href:"https://github.com/PharmaForest/sashash"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    sas_dataset_json: {
+      title: "SAS Dataset JSON",
+      img: "./logo/sas_dataset_json.png",
+      summary: "Sas_dataset_json is a SAS macro package designed to support bi-directional conversion between CDISC-compliant Dataset-JSON format and SAS datasets.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Dataset JSON"],
+      macros: ["%m_sas_to_json1_1()","<br>%m_json1_1_to_sas()","<br>%m_sas_to_ndjson1_1()","<br>%m_ndjson1_1_to_sas()"],
+      badges: ["Dataset JSON","Data Utility","MIT"],
+      links: [{text:"sas_dataset_json", href:"https://github.com/PharmaForest/sas_dataset_json"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    saspacer: {
+      title: "SASPACer",
+      img: "./logo/saspacer.png",
+      summary: "A SAS package to help creating SAS packages. サスパッカー in the logo stands for SASPACer in Japanese. The package is to help creating SAS packages. Shaping onigiri(rice ball) by hands can be a bit challenging for beginners, but using onigiri mold makes it easy to form and provides a great introduction. Hope the mold(SASPACer) will help you to create your SAS package.",
+      license: "MIT",
+      authors: ["Ryo Nakaya"],
+      maintainers: ["Ryo Nakaya"],
+      features: ["SAS Packages"],
+      macros: ["%ex2pac()","<br>%pac2ex()"],
+      badges: ["SAS Packages","Other","MIT"],
+      links: [{text:"saspacker", href:"https://github.com/PharmaForest/sas_dataset_json"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    misc: {
+      title: "misc",
+      img: "./logo/misc.png",
+      summary: "A SAS package to place miscellaneous macros, functions, etc..",
+      license: "MIT",
+      authors: ["PharmaForest"],
+      maintainers: ["PharmaForest"],
+      features: ["Miscellaneous Functions"],
+      macros: ["%xpt2sas()","<br>%minimize_charlen()","<br>%roundsig()","<br>%rounddec()","<br>%color_swatch()"],
+      badges: ["PharmaForest Original","Miscellaneous","Other","MIT"],
+      links: [{text:"misc", href:"https://github.com/PharmaForest/misc"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    sas_faker: {
+      title: "SAS_FAKER",
+      img: "./logo/sas_faker.png",
+      summary: "SAS package to create dummy data in CDISC format for clinical trials Purpose: A macro to generate dummy clinical trial data. Creates datasets in SDTM (DM, AE, SV, VS) and ADaM (ADSL, ADAE，ADVS, ADTTE) formats. Generates pseudo subject data, vital signs, study visits, and adverse events based on user-specified group numbers and sample sizes.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Dummy Data"],
+      macros: ["%sas_faker()"],
+      badges: ["Dummy Data","Data Utility","MIT"],
+      links: [{text:"sas_faker", href:"https://github.com/PharmaForest/sas_faker"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    saslogchecker: {
+      title: "SAS log checker",
+      img: "./logo/saslogchecker.png",
+      summary: "SAS log checker for extracting ERRORs, WARNINGs, and notable NOTEs — supports interactive and directory-wide runs.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Log Checking"],
+      macros: ["%interact_logchk()", "<br>%logchk2directory()"],
+      badges: ["Log","Checker","MIT"],
+      links: [{text:"saslogchecker", href:"https://github.com/PharmaForest/saslogchecker"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    sas_compare: {
+      title: "SAS Compare",
+      img: "./logo/sas_compare.png",
+      summary: "Package to compare SDTM/ADaM, TLF datasets, etc. Assume a double program in the pharmaceutical industry to compare main and sub.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Compare and results checking"],
+      macros: ["%ads_compare()"],
+      badges: ["Compare","Checker","MIT"],
+      links: [{text:"sas_compare", href:"https://github.com/PharmaForest/sas_compare"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    rtfcreator: {
+      title: "RTF Creator",
+      img: "./logo/rtfcreator.png",
+      summary: "A Package that allows you to easily create RTF files from your dataset.",
+      license: "MIT",
+      authors: ["Hiroki Yamanobe"],
+      maintainers: ["Hiroki Yamanobe"],
+      features: ["rtf tables creation"],
+      macros: ["%rtfcreator()"],
+      badges: ["rtf","ODSTable","Output/Visualization","MIT"],
+      links: [{text:"rtfcreator", href:"https://github.com/PharmaForest/rtfcreator"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    shutter_chance: {
+      title: "Shutter_chance",
+      img: "./logo/shutter_chance.png",
+      summary: "SHUTTER_CHANCE: Visual Checkpoints for SAS Data Step Review. MACRO_VARIABLE_SHUTTER_CHANCE: Visually check the global and local status and values of SAS macro variables at any point.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Snapshot in Data step/Macro"],
+      macros: ["%shutter_chance()", "<br>%macro_variable_shutter_chance()"],
+      badges: ["checkpoint","scope","Checker","MIT"],
+      links: [{text:"shutter_chance", href:"https://github.com/PharmaForest/shutter_chance"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    devil: {
+      title: "Developer's Ideas Library(DEVIL)",
+      img: "./logo/devil.png",
+      summary: "Welcome to Developer's Ideas Library. Share your devils (any ideas at any stage) for trial, inspiring, showing-off, recruiting members for further development by showing POC, or even joking(for fun). You can see in description.sas of devil package that author is Any Developers. Devil package is completely different from the other packages in PharmaForest with its highly collaborative nature to welcome any ideas from anyone regardless of usefulness(we would rather prefer playful ones😁). Let's take a break, knock the door of devil!",
+      license: "MIT",
+      authors: ["Any Developers"],
+      maintainers: ["PharmaForest"],
+      features: ["Collaborative and open library"],
+      macros: ["%chatDMS() (Ryo Nakaya)", "<br>text2morse() (Yutaka Morioka)", "<br>%life_game() (Yutaka Morioka)","<br>%sudoku_solver() (Miyuki Aso)","<br>%hanabi() (Akira Matsuzawa, Yutaka Morioka, Ryo Nakaya)"],
+      badges: ["devil","collaborative","400 years","Other","MIT"],
+      links: [{text:"devil", href:"https://github.com/PharmaForest/devil"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    xattr_kit: {
+      title: "xattr_kit",
+      img: "./logo/xattr_kit.png",
+      summary: "xattr_kit is a package to simplify the management of SAS extended attributes",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Extended attributes management"],
+      macros: ["%xattr_set_var()", "<br>%xattr_set_ds()", "<br>%list_xattr()", "<br>%xattr_in()", "<br>%xattr2macrovar()"],
+      badges: ["extended attributes","Data Utility","MIT"],
+      links: [{text:"xattr_kit", href:"https://github.com/PharmaForest/xattr_kit"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
     },
     cloak: {
       title: "Cloak",
-      img: "./logo/cloak_small.png",
-      desc: "データの秘匿化・匿名化ユーティリティ。サンプル配布や検証用に。",
-      badges: ["Privacy"],
-      links: [{text:"Docs", href:"#"}]
+      img: "./logo/cloak.png",
+      summary: "A simple FCMP-based check-in/check-out storage system using dictionary objects in SAS. Store and retrieve data by key, like a digital cloakroom.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["FCMP functions"],
+      macros: ["cloak_num()", "<br>cloak_char()"],
+      badges: ["check-in/check-out","Data Utility","MIT"],
+      links: [{text:"cloak", href:"https://github.com/PharmaForest/cloak"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
     },
     vis_review_kit: {
-      title: "VIS Review Kit",
-      img: "./logo/vis_review_kit_small.png",
-      desc: "可視化レビューのチェックリストと補助スクリプト集。表現の一貫性を担保。",
-      badges: ["Review","QC"],
-      links: [{text:"Docs", href:"#"}]
-    }
+      title: "VIS_Review_Kit",
+      img: "./logo/vis_review_kit.png",
+      summary: "Visual tools for reviewing and monitoring clinical trial data. A SAS macro package to support QC and exploration through graphical representations.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Visual Review"],
+      macros: ["%event_gant_excel()", "<br>%upset_plot()"],
+      badges: ["Visual review","Output/Visualization","MIT"],
+      links: [{text:"vis_review_kit", href:"https://github.com/PharmaForest/vis_review_kit"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    odstable_layoutshowcase: {
+      title: "odstable_layoutshowcase",
+      img: "./logo/odstable_layoutshowcase.png",
+      summary: "A SAS macro toolkit to showcase layout patterns using PROC ODSTABLE. Provides reusable examples of table design with multi-level headers, conditional formatting, composite layouts, and auto-generated RTF output. Ideal for clinical reporting, style template development, and training use.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Showcase of odstable layout"],
+      macros: ["%odstable_layoutshowcase()"],
+      badges: ["ODSTable","Output/Visualization","MIT"],
+      links: [{text:"odstable_layoutshowcase", href:"https://github.com/PharmaForest/odstable_layoutshowcase"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    maxims4sas: {
+      title: "maxims4sas",
+      img: "./logo/maxims4sas.png",
+      summary: "This package displays maxims that have deeply impressed me and that I wish to pass on to future generations.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["Output maxims for SAS programmers"],
+      macros: ["%sas_maxims()"],
+      badges: ["maxims","Other","MIT"],
+      links: [{text:"maxims4sas", href:"https://github.com/PharmaForest/maxims4sas"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
+    forest_navigator: {
+      title: "Dr.Forest Morio",
+      img: "./logo/forest_navigator.png",
+      desc: "Dr. Forest is our receptionist. He is an excellent and diligent GPT assistant who can answer most questions about PharmaForest. However, please understand that he is not speaking on behalf of our organization. You need to sign up to ChatGPT (at least a free user account) to talk to him. See more about his background.",
+      badges: ["PharmaForest","Navigator","GPTs assistant"],
+      links: [{text:"Background", href:"https://github.com/PharmaForest/.github/blob/main/DrForest_background.md"}, {text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
   };
 
   // 左列：ドラッグで縦スクロール（掴んでスワイプ）
@@ -316,14 +491,37 @@
   const panelBadges= document.getElementById('panelBadges');
   const panelLinks = document.getElementById('panelLinks');
 
+  function infoTemplate(it){
+    return `
+      <div class="info">
+        <p class="summary">${it.summary || ""}</p>
+        <div class="info-grid">
+          <div class="label">License</div><div class="value">${it.license || "-"}</div>
+          <div class="label">Author(s)</div><div class="value">${(it.authors||[]).join(", ") || "-"}</div>
+          <div class="label">Maintainer</div><div class="value">${(it.maintainers||[]).join(", ") || "-"}</div>
+          <div class="label">Main Macros</div><div class="value">${(it.macros||[]).join(", ") || "-"}</div>
+          <div class="label">Features</div><div class="value">${(it.features||[]).join(" ・ ") || "-"}</div>
+        </div>
+      </div>`;
+  }
   function updatePanel(key){
     const it = items[key]; if(!it) return;
     panelImg.src = it.img; panelImg.alt = it.title;
     panelTitle.textContent = it.title;
-    panelDesc.textContent = it.desc;
+
+    // ⇩ ここで出し分け
+    if (it.desc) {
+      panelDesc.innerHTML = it.desc;          // PharmaForest
+    } else {
+      panelDesc.innerHTML = infoTemplate(it);  // それ以外（グリッド）
+    }
+
     panelBadges.innerHTML = (it.badges||[]).map(b=>`<span class="badge">${b}</span>`).join('');
-    panelLinks.innerHTML  = (it.links||[]).map(l=>`<a class="btn" href="${l.href}" target="_blank" rel="noopener">${l.text}</a>`).join('');
+    panelLinks.innerHTML = (it.links||[]).map(l =>
+      l.html ? l.html : `<a class="btn" href="${l.href}" target="_blank" rel="noopener">${l.text}</a>`
+    ).join('');
   }
+
 
   // 左の要素クリックで選択＆右更新、中央にスクロール
   const cards = Array.from(document.querySelectorAll('.logo'));
