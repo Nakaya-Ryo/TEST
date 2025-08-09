@@ -145,7 +145,7 @@
       .btn{ font-size:13px; }
     }
 
-    /* スマホ縦向け最適化（最後に置く） */
+    /* スマホ縦向け最適化 */
     @media (max-width: 600px) and (orientation: portrait){
       .layout{
         flex-direction: column;   /* 縦並びを明示 */
@@ -160,6 +160,50 @@
         flex: 1 1 auto;           /* 残り全部使う */
         min-height: 0;            /* ← はみ出し防止。中のoverflowが効く */
         overflow: auto;           /* 右パネル単体でスクロール可能に */
+      }
+    }
+    /* スマホ縦向けの最終調整：下まで確実にスクロールさせる */
+    @media (max-width: 600px) and (orientation: portrait){
+      html, body{
+        height: 100%;
+        overflow: auto; /* bodyのoverflow:hiddenを解除 */
+      }
+
+      .layout{
+        /* 100vhだとアドレスバーで切れやすいのでdvhを使う */
+        height: 100dvh;          /* 新しめの端末用 */
+        min-height: 100vh;       /* フォールバック */
+        flex-direction: column;
+      }
+
+      /* Flex子はどちらも min-height:0 にして子要素のoverflowを有効化 */
+      .layout > .left,
+      .layout > .right{
+        min-height: 0;
+      }
+
+      .left{
+        flex: 0 0 32vh;  /* 上の高さ（好みで 30〜40vh） */
+        height: 32vh;
+        border-right: none;
+        border-bottom: 1px solid #222;
+      }
+
+      .right{
+        flex: 1 1 auto; 
+        overflow: auto; 
+        -webkit-overflow-scrolling: touch; /* iOS慣性スクロール */
+      }
+
+      /* 下端が指で隠れないように余白を少し増やす */
+      .panel{
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      }
+
+      /* 中の画像が幅を突き抜けないように保険 */
+      #panelDesc img{
+        max-width: 100%;
+        height: auto;
       }
     }
 
