@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>PharmaForest Gallery</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">  <style>
     :root{ --left-width: 35vw; --card: 200px; }
     *{ box-sizing: border-box; }
     body{
@@ -145,66 +144,33 @@
       .btn{ font-size:13px; }
     }
 
-    /* スマホ縦向け最適化 */
     @media (max-width: 600px) and (orientation: portrait){
+      /* 100vhだとURLバーでズレるので dvh を優先、古い端末はvhフォールバック */
       .layout{
-        flex-direction: column;   /* 縦並びを明示 */
-        height: 100vh;            /* 画面ぴったり */
+        height: 100dvh;
+        min-height: 100vh;
       }
-      .left{
-        flex: 0 0 35vh;           /* 上を固定高さ */
-        height: 35vh;             /* どっちでも効くように保険 */
-        min-height: 0;            /* ← これが大事 */
-      }
+
+      /* 右ペイン自体がスクロールできるように＆下が隠れないように余白追加 */
       .right{
-        flex: 1 1 auto;           /* 残り全部使う */
-        min-height: 0;            /* ← はみ出し防止。中のoverflowが効く */
-        overflow: auto;           /* 右パネル単体でスクロール可能に */
-      }
-    }
-    /* スマホ縦向けの最終調整：下まで確実にスクロールさせる */
-    @media (max-width: 600px) and (orientation: portrait){
-      html, body{
-        height: 100%;
-        overflow: auto; /* bodyのoverflow:hiddenを解除 */
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        /* アドレス/ホームバー分の余白を常に確保 */
+        padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+        /* スクロール終端がバーに隠れないように “見えない余白” を確保 */
+        scroll-padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
       }
 
-      .layout{
-        /* 100vhだとアドレスバーで切れやすいのでdvhを使う */
-        height: 100dvh;          /* 新しめの端末用 */
-        min-height: 100vh;       /* フォールバック */
-        flex-direction: column;
+      /* 念のため、パネル末尾にもスペーサーを挿入（どちらか一方でもOK） */
+      .panel::after{
+        content: "";
+        display: block;
+        height: calc(24px + env(safe-area-inset-bottom, 0px));
       }
 
-      /* Flex子はどちらも min-height:0 にして子要素のoverflowを有効化 */
+      /* Flexの子要素は min-height:0 を付けて内部スクロールを生かす */
       .layout > .left,
-      .layout > .right{
-        min-height: 0;
-      }
-
-      .left{
-        flex: 0 0 32vh;  /* 上の高さ（好みで 30〜40vh） */
-        height: 32vh;
-        border-right: none;
-        border-bottom: 1px solid #222;
-      }
-
-      .right{
-        flex: 1 1 auto; 
-        overflow: auto; 
-        -webkit-overflow-scrolling: touch; /* iOS慣性スクロール */
-      }
-
-      /* 下端が指で隠れないように余白を少し増やす */
-      .panel{
-        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-      }
-
-      /* 中の画像が幅を突き抜けないように保険 */
-      #panelDesc img{
-        max-width: 100%;
-        height: auto;
-      }
+      .layout > .right{ min-height: 0; }
     }
 
 
