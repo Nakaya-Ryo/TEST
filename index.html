@@ -20,15 +20,17 @@
       display:flex; flex-direction:column;
       overflow-y:auto; height:100%; padding:40px 24px;
       scroll-snap-type: none;
-      cursor:grab;
-      scroll-behavior: smooth;        /* キー操作/scrollIntoViewが滑らかに */
-      -webkit-overflow-scrolling: touch; /* iOSで慣性スクロール */
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;                 /* ← スマホでネイティブ縦スクロール */
+      overscroll-behavior-y: contain;      /* ← iOS/Androidで過剰な弾み防止 */
     }
-    .carousel.dragging{
-      cursor:grabbing;
-      user-select:none;               /* ドラッグ中の文字選択防止でカクつき減 */
+    /* スクロール中は重いトランジションを殺して滑らかに */
+    .carousel.is-scrolling .logo{
+      transition: none !important;
+      box-shadow: none !important;
     }
-    .carousel:active{ cursor:grabbing; }
+
     .logo{
       flex:0 0 auto; width:100%; max-width:520px; height:var(--card);
       margin: -10px auto 22px; /* ちょい重なり感 */
@@ -62,12 +64,12 @@
       flex:1; padding:32px 40px; overflow:auto; position:relative;
      /* background: radial-gradient(800px 400px at 20% 10%, rgba(35,35,45,.28), transparent 60%) #0f0f11;*/
        /* 背景画像を指定 */
-  background-image: url('./logo/picture_pharmaforest.png');
+    background-image: url('./logo/picture_pharmaforest.png');
 
-  /* 背景の表示方法 */
-  background-size: cover;       /* 全体に拡大縮小して表示 */
-  background-position: center;  /* 中央寄せ */
-  background-repeat: no-repeat; /* 繰り返さない */
+    /* 背景の表示方法 */
+    background-size: cover;       /* 全体に拡大縮小して表示 */
+    background-position: center;  /* 中央寄せ */
+    background-repeat: no-repeat; /* 繰り返さない */
     }
     .panel{
       max-width:900px; margin:0 auto;
@@ -148,8 +150,9 @@
       .panel h1{ font-size: 20px; }
       .btn{ padding: 10px 12px; font-size: 14px; }
     }
-
-
+    @media (hover: hover) and (pointer: fine){
+      .logo:hover{ transform: scale(1.06); } /* ←ホバー時の拡大 */
+    }
 
     #panelDesc .info { display:flex; flex-direction:column; gap:12px; }
     #panelDesc .summary { margin:0; color:#cfd3dc; line-height:1.7; }
@@ -262,25 +265,7 @@
   </aside>
 
   <!-- 右：説明パネル -->
-  <main class="right">
-    <section class="panel" id="panel">
-      <div class="hero">
-        <img id="panelImg" src="./logo/pharmaforest.png" alt="">
-        <div>
-          <h1 id="panelTitle">PharmaForest</h1>
-          <div class="badges" id="panelBadges">
-            <span class="badge">SAS Packages</span><span class="badge">Repository</span><span class="badge">Open-Source</span><span class="badge">MIT</span>
-          </div>
-        </div>
-      </div>
-      <div id="panelDesc">
-        A collaborative repository of SAS packages for the pharmaceutical space, powered by PHUSE Japan OST (Open Source Technology) WG members—Hiroki Yamanobe, Yutaka Morioka, and Ryo Nakaya—showcasing the list of available packages.
-      </div>
-      <div class="cta" id="panelLinks">
-        <a class="btn" href="#" target="_blank" rel="noopener">Docs</a>
-        <a class="btn" href="#" target="_blank" rel="noopener">GitHub</a>
-      </div>
-    </section>
+  <main class="right" id="rightPanel">
   </main>
 </div>
 
@@ -504,36 +489,7 @@
     },
   };
 
-  // 左列：ドラッグで縦スクロール（掴んでスワイプ）
-  const carousel = document.getElementById('carousel');
-  let isDown=false, startY=0, scrollTop=0;
-
-  carousel.addEventListener('mousedown', (e)=>{
-    isDown=true; startY=e.pageY - carousel.offsetTop; scrollTop=carousel.scrollTop;
-  });
-  window.addEventListener('mouseup', ()=>{ isDown=false; });
-  carousel.addEventListener('mouseleave', ()=>{ isDown=false; });
-  carousel.addEventListener('mousemove', (e)=>{
-    if(!isDown) return;
-    e.preventDefault();
-    const y = e.pageY - carousel.offsetTop;
-    const walk = (y - startY) * 1.4;
-    carousel.scrollTop = scrollTop - walk;
-  });
-
-  // タップ（モバイル）でもドラッグ
-  let touchStartY=0, touchScrollTop=0;
-  carousel.addEventListener('touchstart', (e)=>{
-    const t=e.touches[0];
-    touchStartY=t.pageY - carousel.offsetTop;
-    touchScrollTop=carousel.scrollTop;
-  }, {passive:true});
-  carousel.addEventListener('touchmove', (e)=>{
-    const t=e.touches[0];
-    const y=t.pageY - carousel.offsetTop;
-    const walk=(y - touchStartY) * 1.2;
-    carousel.scrollTop = touchScrollTop - walk;
-  }, {passive:true});
+  const carousel = document.getElementById('carousel'); // 参照だけ残す
 
   // 右パネル更新
   const panelImg   = document.getElementById('panelImg');
@@ -555,16 +511,36 @@
         </div>
       </div>`;
   }
+  // 右パネル更新（都度DOMを取り直す）
   function updatePanel(key){
-    const it = items[key]; if(!it) return;
-    panelImg.src = it.img; panelImg.alt = it.title;
+    const it = items[key]; 
+    if(!it) return;
+
+    const panelImg    = document.getElementById('panelImg');
+    const panelTitle  = document.getElementById('panelTitle');
+    const panelDesc   = document.getElementById('panelDesc');
+    const panelBadges = document.getElementById('panelBadges');
+    const panelLinks  = document.getElementById('panelLinks');
+    if(!panelImg || !panelTitle || !panelDesc || !panelBadges || !panelLinks) return;
+
+    panelImg.src = it.img; 
+    panelImg.alt = it.title;
     panelTitle.textContent = it.title;
 
-    // ⇩ ここで出し分け
     if (it.desc) {
-      panelDesc.innerHTML = it.desc;          // PharmaForest
+      panelDesc.innerHTML = it.desc;
     } else {
-      panelDesc.innerHTML = infoTemplate(it);  // それ以外（グリッド）
+      panelDesc.innerHTML = `
+        <div class="info">
+          <p class="summary">${it.summary || ""}</p>
+          <div class="info-grid">
+            <div class="label">License</div><div class="value">${it.license || "-"}</div>
+            <div class="label">Author(s)</div><div class="value">${(it.authors||[]).join(", ") || "-"}</div>
+            <div class="label">Maintainer</div><div class="value">${(it.maintainers||[]).join(", ") || "-"}</div>
+            <div class="label">Main Macros</div><div class="value">${(it.macros||[]).join(", ") || "-"}</div>
+            <div class="label">Features</div><div class="value">${(it.features||[]).join(" ・ ") || "-"}</div>
+          </div>
+        </div>`;
     }
 
     panelBadges.innerHTML = (it.badges||[]).map(b=>`<span class="badge">${b}</span>`).join('');
@@ -581,15 +557,31 @@
       cards.forEach(c=>c.classList.remove('active'));
       card.classList.add('active');
       const key = card.getAttribute('data-key');
+
+      const panelHTML = `
+        <section class="panel" id="panel">
+          <div class="hero">
+            <img id="panelImg" src="" alt="">
+            <div>
+              <h1 id="panelTitle"></h1>
+              <div class="badges" id="panelBadges"></div>
+            </div>
+          </div>
+          <div id="panelDesc"></div>
+          <div class="cta" id="panelLinks"></div>
+        </section>
+      `;
+      document.getElementById('rightPanel').innerHTML = panelHTML;
+
       updatePanel(key);
+
       card.scrollIntoView({block:'center', behavior:'smooth'});
     });
   });
 
   // 初期選択
   (function init(){
-    const first = document.querySelector('.logo[data-key="pharmaforest"]') || cards[0];
-    if(first){ updatePanel(first.getAttribute('data-key')); }
+
   })();
 </script>
 </body>
