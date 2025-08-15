@@ -4,7 +4,13 @@
   <meta charset="UTF-8" />
   <title>PharmaForest Gallery</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">  <style>
-    :root{ --left-width: 35vw; --card: 200px; }
+  :root{
+    --stage-w: 500px;   /* キャンバス幅(px) */
+    --stage-h: 600px;    /* キャンバス初期高さ(px) - 後でJSで上書き可 */
+    --logo-size: 140px; /* ロゴの一辺（px） */
+    --left-width: 33vw; /* ← 追加：左の幅を明示（元々未定義） */
+  }
+
     *{ box-sizing: border-box; }
     body{
       margin:0; background:#0f0f11; color:#eaeaea; font-family:system-ui, sans-serif; height:100vh; overflow:hidden;
@@ -16,6 +22,7 @@
     .left{
       width:var(--left-width); border-right:1px solid #222; position:relative; background:#111;
     }
+    .left .logo{ cursor: pointer; }
     .carousel{
       display:flex; flex-direction:column;
       overflow-y:auto; height:100%; padding:40px 24px;
@@ -40,7 +47,7 @@
       box-shadow:0 0 0 rgba(0,0,0,0);
       border:1px solid #2b2b2f;
     }
-    .logo:hover{ transform:scale(1.06); }
+    .logo:hover{ transform:scale(0.80); }
     .logo.active{
       transform:scale(1.1);
       box-shadow: 0 0 15px rgba(0, 170, 255, 0.8), /* 外側に青く発光 */
@@ -72,7 +79,7 @@
     background-repeat: no-repeat; /* 繰り返さない */
     }
     .panel{
-      max-width:900px; margin:0 auto;
+      max-width:1100px; margin:0 auto;
       padding:28px 28px 32px; border:1px solid #2b2b2f; border-radius:20px; background:#141418;
       box-shadow:0 10px 30px rgba(0,0,0,.28);
     }
@@ -177,12 +184,53 @@
       min-width:0; /* 長文の折返し安定化 */
       word-break: break-word;
     }
+  /* ── Honeycomb grid ───────────────────────────── */
+  .free-outer{
+    width:100%;
+    overflow:auto;           /* ステージが大きくなったらスクロール */
+    margin-bottom: clamp(16px, 2vw, 32px);
+  }
+
+  .free-wrap{
+    position: relative;
+    margin: 12px auto 0;
+    width:  calc(var(--stage-w) * 1px);
+    height: calc(var(--stage-h) * 1px);
+    background: transparent;
+  }
+
+  .free{
+    position: absolute;
+    width: var(--logo-size);
+    height: var(--logo-size);
+    /* ← ここがpx固定（%は使わない） */
+    top:  calc(var(--y, 0) * 1px);
+    left: calc(var(--x, 0) * 1px);
+    transform: translate(-50%, -50%) scale(var(--scale, 1));
+  }
+
+  /* 画像は四角でOK。透明背景があるので視覚的な干渉なし */
+  .free img{
+    width: var(--logo-img-pct);
+    height: var(--logo-img-pct);
+    object-fit: contain;
+    -webkit-user-drag: none; user-select: none;
+  }
+
+  /* 重なった時の操作性確保：ホバーしたものを最前面に */
+  .free:hover{ transform: translate(-50%, -50%) scale(0.80); z-index: 10; }
+
+  /* スマホ時は少し詰めるなどの調整も可 */
+  @media (max-width: 600px){
+    .free-wrap{ aspect-ratio: 4/5; }
+  }
+
   </style>
 </head>
 <body>
 
 <div class="layout">
-  <!-- 左：ロゴリスト（縦スクロール＆ドラッグ） -->
+  <!-- 左：ロゴリスト（縦スクロール） -->
   <aside class="left">
     <div class="carousel" id="carousel">
       <!-- data-key は下の items[] と対応させる -->
@@ -207,7 +255,7 @@
       </div>
       <div class="logo" data-key="saspacer">
         <img src="./logo/saspacer.png" alt="saspacer">
-        <div class="meta"><div class="title">saspacer</div><div class="hint">SAS Package Generator</div></div>
+        <div class="meta"><div class="title">SASPACer</div><div class="hint">SAS Package Generator</div></div>
       </div>
       <div class="logo" data-key="misc">
         <img src="./logo/misc.png" alt="misc">
@@ -257,9 +305,13 @@
         <img src="./logo/maxims4sas.png" alt="maxims4sas">
         <div class="meta"><div class="title">maxims4sas</div><div class="hint">Best Practices for SAS</div></div>
       </div>
+      <div class="logo" data-key="laglead">
+        <img src="./logo/laglead.png" alt="laglead">
+        <div class="meta"><div class="title">laglead</div><div class="hint">Dynamic lead/lag value access</div></div>
+      </div>
       <div class="logo" data-key="forest_navigator">
         <img src="./logo/forest_navigator.png" alt="forest_navigator">
-        <div class="meta"><div class="title">Dr. Forest Morio</div><div class="hint">Navigater of PharmaForest</div></div>
+        <div class="meta"><div class="title">Dr. Forest, Morio</div><div class="hint">Navigater of PharmaForest</div></div>
       </div>
     </div>
   </aside>
@@ -277,11 +329,7 @@
       img: "./logo/pharmaforest.png",
       desc: 
       `
-      A collaborative repository of SAS packages for the pharmaceutical space, powered by PHUSE Japan OST (Open Source Technology) WG members—Hiroki Yamanobe, Yutaka Morioka, and Ryo Nakaya—showcasing the list of available packages. Any collaboration is very welcome!<br><br>
-      <img src="./logo/wewantyou.png" 
-     alt="we want you" 
-     style="max-width:60%; border-radius:12px; margin-bottom:16px; display:block; margin:0 auto;">
-
+      A collaborative repository of SAS packages for the pharmaceutical space, powered by PHUSE Japan OST (Open Source Technology) WG members—Hiroki Yamanobe, Yutaka Morioka, and Ryo Nakaya—showcasing the list of available packages. 
 
       <br><br> PharmaForest is built on top of SAS Packages framework(SPF), which was developed by Bartosz Jablonski. There are more packages in his repository SAS Packages Archive(SASPAC).<br>
       `,
@@ -334,7 +382,7 @@
       features: ["SAS Packages"],
       macros: ["%ex2pac()","<br>%pac2ex()"],
       badges: ["SAS Packages","Other","MIT"],
-      links: [{text:"saspacker", href:"https://github.com/PharmaForest/sas_dataset_json"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+      links: [{text:"saspacker", href:"https://github.com/PharmaForest/SASPACer"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
     },
     misc: {
       title: "misc",
@@ -480,10 +528,27 @@
       badges: ["maxims","Other","MIT"],
       links: [{text:"maxims4sas", href:"https://github.com/PharmaForest/maxims4sas"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
     },
+    laglead: {
+      title: "laglead",
+      img: "./logo/laglead.png",
+      summary: "SAS utilities for dynamic lead/lag value access.",
+      license: "MIT",
+      authors: ["Yutaka Morioka"],
+      maintainers: ["Yutaka Morioka"],
+      features: ["lead", "lag"],
+      macros: ["%laglead()"],
+      badges: ["lag","lead","Data Utility","MIT"],
+      links: [{text:"laglead", href:"https://github.com/PharmaForest/laglead"},{text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
+    },
     forest_navigator: {
-      title: "Dr.Forest Morio",
+      title: "Dr. Forest, Morio",
       img: "./logo/forest_navigator.png",
-      desc: "Dr. Forest is our receptionist. He is an excellent and diligent GPT assistant who can answer most questions about PharmaForest. However, please understand that he is not speaking on behalf of our organization. You need to sign up to ChatGPT (at least a free user account) to talk to him. See more about his background.",
+      desc: `
+      Dr. Forest is our receptionist. He is an excellent and diligent GPT assistant who can answer most questions about PharmaForest. However, please understand that he is not speaking on behalf of our organization. You need to sign up to ChatGPT (at least a free user account) to talk to him. See more about his background.<br><br> Any collaboration with PharmaForest is very welcome!<br><br>
+      <img src="./logo/wewantyou.png" 
+     alt="we want you" 
+     style="max-width:60%; border-radius:12px; margin-bottom:16px; display:block; margin:0 auto;">
+      `,
       badges: ["PharmaForest","Navigator","GPTs assistant"],
       links: [{text:"Background", href:"https://github.com/PharmaForest/.github/blob/main/DrForest_background.md"}, {text:"Ask Dr.Forest", href:"https://chatgpt.com/g/g-6881d98193ec8191abb19e4e920cb64c-dr-forest"}]
     },
@@ -504,50 +569,138 @@
         <p class="summary">${it.summary || ""}</p>
         <div class="info-grid">
           <div class="label">License</div><div class="value">${it.license || "-"}</div>
-          <div class="label">Author(s)</div><div class="value">${(it.authors||[]).join(", ") || "-"}</div>
-          <div class="label">Maintainer</div><div class="value">${(it.maintainers||[]).join(", ") || "-"}</div>
+          <div class="label">Authors</div><div class="value">${(it.authors||[]).join(", ") || "-"}</div>
+          <div class="label">Maintainers</div><div class="value">${(it.maintainers||[]).join(", ") || "-"}</div>
           <div class="label">Main Macros</div><div class="value">${(it.macros||[]).join(", ") || "-"}</div>
           <div class="label">Features</div><div class="value">${(it.features||[]).join(" ・ ") || "-"}</div>
         </div>
       </div>`;
   }
-  // 右パネル更新（都度DOMを取り直す）
+
+const layoutMap = {
+  oncoplotter:      {x: 40, y: 100, scale: 0.6},
+  sashash:          {x: 150, y: 100, scale: 0.6},
+  sas_dataset_json: {x: 260, y: 100, scale: 0.6},
+  devil:            {x: 366, y: 100, scale: 0.66},
+  odstable_layoutshowcase:
+                    {x: 473, y: 100, scale: 0.6},
+
+  saspacer:         {x: 100, y: 200, scale: 0.6},
+  misc:             {x: 206, y: 200, scale: 0.6},
+  sas_faker:        {x: 317, y: 200, scale: 0.6},
+  xattr_kit:        {x: 423, y: 205, scale: 0.63},
+  cloak:            {x: 530, y: 200, scale: 0.6},
+
+  saslogchecker:    {x: 40, y: 300, scale: 0.6},
+  sas_compare:      {x: 150, y: 300, scale: 0.6},
+  rtfcreator:       {x: 260, y: 300, scale: 0.6},
+  shutter_chance:   {x: 369, y: 300, scale: 0.61},
+  vis_review_kit:   {x: 470, y: 300, scale: 0.6},
+
+  maxims4sas:       {x: 97, y: 400, scale: 0.6},
+  laglead:          {x: 205, y: 400, scale: 0.6}
+};
+
+
+function buildFreeBoard(itemsObj){
+  const keys = Object.keys(layoutMap).filter(k => itemsObj[k]?.img);
+
+  // ステージサイズを自動調整（px）
+  const LOGO = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--logo-size')) || 140;
+  let maxX = 0, maxY = 0;
+  keys.forEach(k=>{
+    const p = layoutMap[k] || {};
+    if (typeof p.x === 'number') maxX = Math.max(maxX, p.x);
+    if (typeof p.y === 'number') maxY = Math.max(maxY, p.y);
+  });
+  // 余白分としてロゴ半径+40px程度を足す（中心指定のため）
+  const stageW = Math.max(500, Math.ceil(maxX + LOGO * 0.6 + 40));
+  const stageH = Math.max(600,  Math.ceil(maxY + LOGO * 0.6 + 40));
+  const wrapStyle = `style="--stage-w:${stageW}; --stage-h:${stageH};"`;
+
+  const cells = keys.map(k=>{
+    const v = itemsObj[k];
+    const gh = (v.links||[]).find(l => (l.href||'').startsWith('https://github.com/PharmaForest/'));
+    const href = gh ? gh.href : (v.links?.[0]?.href || '#');
+    const pos  = layoutMap[k] || {};
+    const style = `style="--x:${pos.x ?? 0}; --y:${pos.y ?? 0}; --scale:${pos.scale ?? 1};"`;
+    return `
+      <a class="free" ${style} href="${href}" target="_blank" rel="noopener" title="${v.title||k}">
+        <span class="hex"><img src="${v.img}" alt="${v.title||k}"></span>
+      </a>`;
+  }).join('');
+
+  return `
+    <section class="panel" id="panel">
+      <div class="hero">
+        <img id="panelImg" src="./logo/pharmaforest.png" alt="PharmaForest">
+        <div>
+          <h1 id="panelTitle">PharmaForest</h1>
+          <div class="badges" id="panelBadges">
+            ${(items['pharmaforest'].badges||[]).map(b=>`<span class="badge">${b}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div id="panelDesc">${items['pharmaforest'].desc || ''}</div>
+
+      <div class="free-outer">
+        <div class="free-wrap" ${wrapStyle}>
+          ${cells}
+        </div>
+      </div>
+
+      <div class="cta" id="panelLinks">
+        ${(items['pharmaforest'].links||[]).map(l =>
+          l.html ? l.html : `<a class="btn" href="${l.href}" target="_blank" rel="noopener">${l.text}</a>`
+        ).join('')}
+      </div>
+    </section>`;
+}
+
+
   function updatePanel(key){
-    const it = items[key]; 
+    const it = items[key];
     if(!it) return;
 
-    const panelImg    = document.getElementById('panelImg');
-    const panelTitle  = document.getElementById('panelTitle');
-    const panelDesc   = document.getElementById('panelDesc');
-    const panelBadges = document.getElementById('panelBadges');
-    const panelLinks  = document.getElementById('panelLinks');
-    if(!panelImg || !panelTitle || !panelDesc || !panelBadges || !panelLinks) return;
-
-    panelImg.src = it.img; 
-    panelImg.alt = it.title;
-    panelTitle.textContent = it.title;
-
-    if (it.desc) {
-      panelDesc.innerHTML = it.desc;
-    } else {
-      panelDesc.innerHTML = `
-        <div class="info">
-          <p class="summary">${it.summary || ""}</p>
-          <div class="info-grid">
-            <div class="label">License</div><div class="value">${it.license || "-"}</div>
-            <div class="label">Author(s)</div><div class="value">${(it.authors||[]).join(", ") || "-"}</div>
-            <div class="label">Maintainer</div><div class="value">${(it.maintainers||[]).join(", ") || "-"}</div>
-            <div class="label">Main Macros</div><div class="value">${(it.macros||[]).join(", ") || "-"}</div>
-            <div class="label">Features</div><div class="value">${(it.features||[]).join(" ・ ") || "-"}</div>
-          </div>
-        </div>`;
+    const right = document.getElementById('rightPanel');
+    if(key === 'pharmaforest'){
+      right.innerHTML = buildFreeBoard(items);
+      return; // 以降の通常更新はスキップ
     }
 
-    panelBadges.innerHTML = (it.badges||[]).map(b=>`<span class="badge">${b}</span>`).join('');
-    panelLinks.innerHTML = (it.links||[]).map(l =>
-      l.html ? l.html : `<a class="btn" href="${l.href}" target="_blank" rel="noopener">${l.text}</a>`
-    ).join('');
+    // ── 通常の詳細パネル（従来処理） ──
+    const panelHTML = `
+      <section class="panel" id="panel">
+        <div class="hero">
+          <img id="panelImg" src="${it.img}" alt="${it.title}">
+          <div>
+            <h1 id="panelTitle">${it.title}</h1>
+            <div class="badges" id="panelBadges">
+              ${(it.badges||[]).map(b=>`<span class="badge">${b}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div id="panelDesc">${
+          it.desc ? it.desc : `
+            <div class="info">
+              <p class="summary">${it.summary || ""}</p>
+              <div class="info-grid">
+                <div class="label">License</div><div class="value">${it.license || "-"}</div>
+                <div class="label">Authors</div><div class="value">${(it.authors||[]).join(", ") || "-"}</div>
+                <div class="label">Maintainers</div><div class="value">${(it.maintainers||[]).join(", ") || "-"}</div>
+                <div class="label">Main Macros</div><div class="value">${(it.macros||[]).join(", ") || "-"}</div>
+                <div class="label">Features</div><div class="value">${(it.features||[]).join(" ・ ") || "-"}</div>
+              </div>
+            </div>`
+        }</div>
+        <div class="cta" id="panelLinks">
+          ${(it.links||[]).map(l => l.html ? l.html : `<a class="btn" href="${l.href}" target="_blank" rel="noopener">${l.text}</a>`).join('')}
+        </div>
+      </section>`;
+    right.innerHTML = panelHTML;
   }
+
 
 
   // 左の要素クリックで選択＆右更新、中央にスクロール
@@ -557,24 +710,7 @@
       cards.forEach(c=>c.classList.remove('active'));
       card.classList.add('active');
       const key = card.getAttribute('data-key');
-
-      const panelHTML = `
-        <section class="panel" id="panel">
-          <div class="hero">
-            <img id="panelImg" src="" alt="">
-            <div>
-              <h1 id="panelTitle"></h1>
-              <div class="badges" id="panelBadges"></div>
-            </div>
-          </div>
-          <div id="panelDesc"></div>
-          <div class="cta" id="panelLinks"></div>
-        </section>
-      `;
-      document.getElementById('rightPanel').innerHTML = panelHTML;
-
-      updatePanel(key);
-
+      updatePanel(key);                    // ← これだけ
       card.scrollIntoView({block:'center', behavior:'smooth'});
     });
   });
