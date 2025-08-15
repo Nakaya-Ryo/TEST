@@ -184,11 +184,31 @@
       min-width:0; /* 長文の折返し安定化 */
       word-break: break-word;
     }
+
+  /* 追加：チェックOFF時に薄くする */
+  .free.dim img{
+    filter: grayscale(1) brightness(.7) opacity(.35);
+    transition: filter .2s ease, opacity .2s ease;
+  }
+
+  /* 追加：フィルターUI */
+  .filters{
+    display:flex; gap:12px; flex-wrap:wrap;
+    margin: 4px 0 0;
+  }
+  .filters label{
+    display:inline-flex; gap:8px; align-items:center;
+    font-size:14px; background:#1a1a1f; border:1px solid #3b3b42;
+    padding:8px 12px; border-radius:999px; cursor:pointer;
+  }
+  .filters input{ accent-color:#39a0ff; }
+
   /* ── Honeycomb grid ───────────────────────────── */
   .free-outer{
     width:100%;
     overflow:auto;           /* ステージが大きくなったらスクロール */
     margin-bottom: clamp(16px, 2vw, 32px);
+    margin-top: 0;       /* もし余白があればゼロに */
   }
 
   .free-wrap{
@@ -331,7 +351,7 @@
       `
       A collaborative repository of SAS packages for the pharmaceutical space, powered by PHUSE Japan OST (Open Source Technology) WG members—Hiroki Yamanobe, Yutaka Morioka, and Ryo Nakaya—showcasing the list of available packages. 
 
-      <br><br> PharmaForest is built on top of SAS Packages framework(SPF), which was developed by Bartosz Jablonski. There are more packages in his repository SAS Packages Archive(SASPAC).<br>
+      <br><br> PharmaForest is built on top of SAS Packages framework(SPF), which was developed by Bartosz Jablonski. There are more packages in his repository SAS Packages Archive(SASPAC).<br><br>
       `,
       badges: ["SAS Packages","Repository","Open-Source","MIT"],
       links: [{text:"PharmaForest", href:"https://github.com/PharmaForest"}, {text:"SPF", href:"https://github.com/yabwon/SAS_PACKAGES"},{text:"SASPAC", href:"https://github.com/SASPAC"}]
@@ -601,11 +621,9 @@ const layoutMap = {
   laglead:          {x: 205, y: 400, scale: 0.6}
 };
 
-
 function buildFreeBoard(itemsObj){
   const keys = Object.keys(layoutMap).filter(k => itemsObj[k]?.img);
 
-  // ステージサイズを自動調整（px）
   const LOGO = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--logo-size')) || 140;
   let maxX = 0, maxY = 0;
   keys.forEach(k=>{
@@ -613,22 +631,38 @@ function buildFreeBoard(itemsObj){
     if (typeof p.x === 'number') maxX = Math.max(maxX, p.x);
     if (typeof p.y === 'number') maxY = Math.max(maxY, p.y);
   });
-  // 余白分としてロゴ半径+40px程度を足す（中心指定のため）
   const stageW = Math.max(500, Math.ceil(maxX + LOGO * 0.6 + 40));
   const stageH = Math.max(600,  Math.ceil(maxY + LOGO * 0.6 + 40));
   const wrapStyle = `style="--stage-w:${stageW}; --stage-h:${stageH};"`;
 
+  // 4カテゴリの抽出
+  const TAGS = ["Output/Visualization","Data Utility","Checker","Other"];
+
+  // ハニカムセル
   const cells = keys.map(k=>{
     const v = itemsObj[k];
     const gh = (v.links||[]).find(l => (l.href||'').startsWith('https://github.com/PharmaForest/'));
     const href = gh ? gh.href : (v.links?.[0]?.href || '#');
     const pos  = layoutMap[k] || {};
     const style = `style="--x:${pos.x ?? 0}; --y:${pos.y ?? 0}; --scale:${pos.scale ?? 1};"`;
+    const hoverAttr = v.hover ? ` data-hover="${v.hover}"` : "";
+    const tags = (v.badges||[]).filter(b => TAGS.includes(b));
+    const tagAttr = `data-tags="${tags.join('|')}"`;
     return `
-      <a class="free" ${style} href="${href}" target="_blank" rel="noopener" title="${v.title||k}">
-        <span class="hex"><img src="${v.img}" alt="${v.title||k}"></span>
+      <a class="free" ${style} ${tagAttr} href="${href}" target="_blank" rel="noopener" title="${v.title||k}">
+        <span class="hex"><img src="${v.img}"${hoverAttr} alt="${v.title||k}"></span>
       </a>`;
   }).join('');
+
+  // ★ラジオボタン（ハニカムの“上”）
+  const radiosHTML = `
+    <div class="filters" id="filters">
+      <label><input type="radio" name="cat" value="All" checked> All</label>
+      <label><input type="radio" name="cat" value="Output/Visualization"> Output/Visualization</label>
+      <label><input type="radio" name="cat" value="Data Utility"> Data Utility</label>
+      <label><input type="radio" name="cat" value="Checker"> Checker</label>
+      <label><input type="radio" name="cat" value="Other"> Other</label>
+    </div>`;
 
   return `
     <section class="panel" id="panel">
@@ -643,6 +677,8 @@ function buildFreeBoard(itemsObj){
       </div>
 
       <div id="panelDesc">${items['pharmaforest'].desc || ''}</div>
+
+      ${radiosHTML}            <!-- ← ここがハニカム“上” -->
 
       <div class="free-outer">
         <div class="free-wrap" ${wrapStyle}>
@@ -659,14 +695,53 @@ function buildFreeBoard(itemsObj){
 }
 
 
+// 既存：ホバー差し替えはそのまま
+function attachHoneycombHover(){
+  const imgs = document.querySelectorAll('#panel .free img[data-hover]');
+  imgs.forEach(img=>{
+    const orig  = img.getAttribute('src');
+    const hover = img.getAttribute('data-hover');
+    const pre = new Image(); pre.src = hover;
+    img.addEventListener('mouseenter', ()=>{ img.src = hover; });
+    img.addEventListener('mouseleave', ()=>{ img.src = orig;  });
+    img.addEventListener('touchstart', ()=>{ img.src = hover; }, {passive:true});
+    img.addEventListener('touchend',   ()=>{ img.src = orig;  }, {passive:true});
+  });
+}
+
+// ★新規：ラジオ版フィルター
+function attachCategoryRadios(){
+  const panel = document.getElementById('panel');
+  const radios = panel.querySelectorAll('#filters input[type="radio"][name="cat"]');
+  const icons  = panel.querySelectorAll('.free');
+
+  function apply(){
+    const picked = panel.querySelector('#filters input[name="cat"]:checked')?.value || 'All';
+    if (picked === 'All'){
+      icons.forEach(a => a.classList.remove('dim'));
+      return;
+    }
+    icons.forEach(a=>{
+      const tags = (a.getAttribute('data-tags') || '').split('|').filter(Boolean);
+      const matched = tags.includes(picked);
+      a.classList.toggle('dim', !matched);  // 一致しないものだけグレー
+    });
+  }
+
+  radios.forEach(r => r.addEventListener('change', apply));
+  apply(); // 初回
+}
+
   function updatePanel(key){
     const it = items[key];
     if(!it) return;
 
     const right = document.getElementById('rightPanel');
-    if(key === 'pharmaforest'){
+    if (key === 'pharmaforest'){
       right.innerHTML = buildFreeBoard(items);
-      return; // 以降の通常更新はスキップ
+      attachHoneycombHover();
+      attachCategoryRadios(); 
+      return;
     }
 
     // ── 通常の詳細パネル（従来処理） ──
@@ -701,10 +776,7 @@ function buildFreeBoard(itemsObj){
     right.innerHTML = panelHTML;
   }
 
-
-
   // 左の要素クリックで選択＆右更新、中央にスクロール
-// 左の要素クリック＆ホバー差し替えの両方を付与
 const cards = Array.from(document.querySelectorAll('.logo'));
 cards.forEach(card => {
   const img = card.querySelector('img');
@@ -718,7 +790,6 @@ cards.forEach(card => {
     card.scrollIntoView({ block: 'center', behavior: 'smooth' });
   });
 
-  // --- ホバー差し替え（現状のまま） ---
   if (img) {
     const orig = img.getAttribute('src');
     const hover = img.dataset.hover;
