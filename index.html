@@ -80,7 +80,7 @@
     }
     .panel{
       max-width:1100px; margin:0 auto;
-      padding:28px 28px 32px; border:1px solid #2b2b2f; border-radius:20px; background:#141418;
+      padding:28px 28px 32px; border:1px solid #2b2b2f; border-radius:20px; background: rgba(20, 20, 24, 0.7);
       box-shadow:0 10px 30px rgba(0,0,0,.28);
     }
     .panel .hero{
@@ -704,21 +704,40 @@ function buildFreeBoard(itemsObj){
 
 
   // 左の要素クリックで選択＆右更新、中央にスクロール
-  const cards = Array.from(document.querySelectorAll('.logo'));
-  cards.forEach(card=>{
-    card.addEventListener('click', ()=>{
-      cards.forEach(c=>c.classList.remove('active'));
-      card.classList.add('active');
-      const key = card.getAttribute('data-key');
-      updatePanel(key);                    // ← これだけ
-      card.scrollIntoView({block:'center', behavior:'smooth'});
-    });
+// 左の要素クリック＆ホバー差し替えの両方を付与
+const cards = Array.from(document.querySelectorAll('.logo'));
+cards.forEach(card => {
+  const img = card.querySelector('img');
+  const key = card.getAttribute('data-key');
+
+  // --- クリックで右パネル更新（復活） ---
+  card.addEventListener('click', () => {
+    cards.forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    updatePanel(key);
+    card.scrollIntoView({ block: 'center', behavior: 'smooth' });
   });
+
+  // --- ホバー差し替え（現状のまま） ---
+  if (img) {
+    const orig = img.getAttribute('src');
+    const hover = img.dataset.hover;
+    if (hover) {
+      const pre = new Image(); pre.src = hover; // プリロード
+      card.addEventListener('mouseenter', () => { img.src = hover; });
+      card.addEventListener('mouseleave', () => { img.src = orig;  });
+      card.addEventListener('touchstart', () => { img.src = hover; }, {passive:true});
+      card.addEventListener('touchend',   () => { img.src = orig;  }, {passive:true});
+    }
+  }
+});
 
   // 初期選択
   (function init(){
 
   })();
+
+
 </script>
 </body>
 </html>
